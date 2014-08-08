@@ -20,7 +20,7 @@ class YoUpdateError < StandardError; end
 
 def yo_update_api_key
 	r = @conf['yo_update.api_key']
-	raise YoUpdateError, "Yo API Key is not set" unless r
+	raise YoUpdateError, "Yo API Key is not set" if not r or r.empty?
 	return r
 end
 
