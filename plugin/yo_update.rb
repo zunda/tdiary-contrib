@@ -39,6 +39,25 @@ def yo_update_access_api(req)
 	}
 end
 
+def yo_update_send_yo(username = nil)
+	begin
+		req = Net::HTTP::Post.new(URI("http://api.justyo.co/yo/"))
+		unless username
+			req.set_form_data('api_token' => yo_update_api_key)
+		else
+			req.set_form_data('api_token' => yo_update_api_key, 'username' => username)
+		end
+		res = yo_update_access_api(req)
+		data = res.body
+		unless data == '{"result": "OK"}'
+			raise YoUpdateError, "error from Yo API: #{data}"
+		end
+		return data
+	rescue YoUpdateError => e
+		return e.message
+	end
+end
+
 def yo_update_subscribers_count
 	begin
 		req = Net::HTTP::Get.new(
@@ -59,12 +78,18 @@ def yo_update_subscribers_count
 end
 
 add_conf_proc('yo_update', 'Yo! with update' ) do
+	test_result = ''
    if @mode == 'saveconf' then
       @conf['yo_update.api_key'] = @cgi.params['yo_update.api_key'][0]
       @conf['yo_update.username'] = @cgi.params['yo_update.username'][0]
       @conf['yo_update.send_on_update'] = (@cgi.params['yo_update.send_on_update'][0] == 't')
       @conf['yo_update.send_on_comment'] = (@cgi.params['yo_update.send_on_comment'][0] == 't')
-	elsif not @conf.has_key?('yo_update.send_on_update')
+		test_username = @cgi.params['yo_update.test'][0]
+		if test_username #and not test_username.empty?
+			test_result = "- Sent to <tt>#{h test_username}</tt>: <tt>#{h yo_update_send_yo(test_username)}</tt>"
+		end
+	end
+	unless @conf.has_key?('yo_update.send_on_update')
 		@conf['yo_update.send_on_update'] = true
    end
    
@@ -81,6 +106,7 @@ add_conf_proc('yo_update', 'Yo! with update' ) do
 		%Q|<li><label for="#{action}"><input name="yo_update.#{action}" value="t" type="checkbox"#{checked}>#{label}</label>|
 	}.join("\n")}
 	</ul>
+   <p>Test sending Yo! to <input name="yo_update.test" value="" size="10">#{test_result}</p>
    <h3 class="subtitle">Current Subscribers</h3>
 	<p>#{h yo_update_subscribers_count}</p>
    HTML
