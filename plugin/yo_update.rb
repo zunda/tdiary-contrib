@@ -49,6 +49,10 @@ add_conf_proc('yo_update', 'Yo! with update' ) do
    if @mode == 'saveconf' then
       @conf['yo_update.api_key'] = @cgi.params['yo_update.api_key'][0]
       @conf['yo_update.username'] = @cgi.params['yo_update.username'][0]
+      @conf['yo_update.send_on_update'] = (@cgi.params['yo_update.send_on_update'][0] == 't')
+      @conf['yo_update.send_on_comment'] = (@cgi.params['yo_update.send_on_comment'][0] == 't')
+	elsif not @conf.has_key?('yo_update.send_on_update')
+		@conf['yo_update.send_on_update'] = true
    end
    
    <<-HTML
@@ -56,6 +60,14 @@ add_conf_proc('yo_update', 'Yo! with update' ) do
    <p><input name="yo_update.api_key" value="#{h @conf['yo_update.api_key']}" size="70"></p>
    <h3 class="subtitle">Username</h3>
    <p><input name="yo_update.username" value="#{h @conf['yo_update.username']}" size="70"></p>
+   <h3 class="subtitle">Send Yo!</h3>
+	<ul>
+	#{%w(send_on_update send_on_comment).map{|action|
+		checked = @conf["yo_update.#{action}"] ? ' checked' : ''
+		label = action
+		%Q|<li><label for="#{action}"><input name="yo_update.#{action}" value="t" type="checkbox"#{checked}>#{label}</label>|
+	}.join("\n")}
+	</ul>
    <h3 class="subtitle">Current Subscribers</h3>
 	<p>#{h yo_update_subscribers_count}</p>
    HTML
