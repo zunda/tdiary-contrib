@@ -13,7 +13,7 @@
 
 require 'uri'
 require 'timeout'
-require 'open-uri'
+require 'net/http'
 require 'json'
 
 class YoUpdateError < StandardError; end
@@ -27,12 +27,20 @@ end
 # TODO: rescue timeout and other network errors
 def yo_update_subscribers_count
 	begin
-		params = ["http://api.justyo.co/subscribers_count/?api_token=#{URI.escape(yo_update_api_key)}"]
-		params << {:proxy => "http://#{@conf['proxy']}"} if @conf['proxy']
-		data = nil
-		open(*params) do |f|
-			data = f.read
+		uri = URI("http://api.justyo.co/subscribers_count/?api_token=#{URI.escape(yo_update_api_key)}")
+		if @conf['proxy']
+			proxy_uri = URI("http://" + @conf['proxy'])
+			proxy_addr = proxy_uri.host
+			proxy_port = proxy_uri.port
+		else
+			proxy_addr = nil
+			proxy_port = nil
 		end
+		req = Net::HTTP::Get.new(uri)
+		res = Net::HTTP.start(uri.host, uri.port, proxy_addr, proxt_port){|http|
+			http.request(req)
+		}
+		data = res.body
 		r = JSON::parse(data)
 		if r.has_key?('result')
 			return r['result']
