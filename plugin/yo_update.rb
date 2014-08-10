@@ -48,22 +48,18 @@ def yo_update_access_api(req)
 end
 
 def yo_update_send_yo(username = nil)
-	begin
-		req = Net::HTTP::Post.new(URI("http://api.justyo.co/yo/"))
-		unless username
-			req.set_form_data('api_token' => yo_update_api_key)
-		else
-			req.set_form_data('api_token' => yo_update_api_key, 'username' => username)
-		end
-		res = yo_update_access_api(req)
-		data = res.body
-		unless data == '{"result": "OK"}'
-			raise YoUpdateError, "error from Yo API: #{data}"
-		end
-		return data
-	rescue YoUpdateError => e
-		return e.message
+	req = Net::HTTP::Post.new(URI("http://api.justyo.co/yo/"))
+	unless username
+		req.set_form_data('api_token' => yo_update_api_key)
+	else
+		req.set_form_data('api_token' => yo_update_api_key, 'username' => username)
 	end
+	res = yo_update_access_api(req)
+	data = res.body
+	unless data == '{"result": "OK"}'
+		raise YoUpdateError, "error from Yo API: #{data}"
+	end
+	return data
 end
 
 def yo_update_subscribers_count
@@ -72,12 +68,15 @@ def yo_update_subscribers_count
 	)
 	res = yo_update_access_api(req)
 	data = res.body
-	r = JSON::parse(data)
-	if r.has_key?('result')
-		return r['result']
-	elsif r.has_key?('error')
-		e = JSON::parse(r['error'])
-		raise YoUpdateError, "Error from Yo API: #{e['message']} (code:#{e['code']})"
+	begin
+		r = JSON::parse(data)
+		if r.has_key?('result')
+			return r['result']
+		else
+			raise YoUpdateError, "Error from Yo API: #{data}"
+		end
+	rescue JSON::ParserError
+		raise YoUpdateError, "Error from Yo API: #{data}"
 	end
 end
 
