@@ -16,6 +16,8 @@ require 'timeout'
 require 'net/http'
 require 'json'
 
+YO_UPDATE_TIMEOUT = 10
+
 class YoUpdateError < StandardError; end
 
 def yo_update_api_key
@@ -34,9 +36,15 @@ def yo_update_access_api(req)
 		proxy_addr = nil
 		proxy_port = nil
 	end
-	return Net::HTTP.start(req.uri.host, req.uri.port, proxy_addr, proxt_port){|http|
-		http.request(req)
-	}
+	begin
+		timeout(YO_UPDATE_TIMEOUT) do
+			return Net::HTTP.start(req.uri.host, req.uri.port, proxy_addr, proxt_port){|http|
+				http.request(req)
+			}
+		end
+	rescue Timeout::Error
+		raise YoUpdateError, "Timeout accessing Yo API"
+	end
 end
 
 def yo_update_send_yo(username = nil)
@@ -59,21 +67,17 @@ def yo_update_send_yo(username = nil)
 end
 
 def yo_update_subscribers_count
-	begin
-		req = Net::HTTP::Get.new(
-			URI("http://api.justyo.co/subscribers_count/?api_token=#{URI.escape(yo_update_api_key)}")
-		)
-		res = yo_update_access_api(req)
-		data = res.body
-		r = JSON::parse(data)
-		if r.has_key?('result')
-			return r['result']
-		elsif r.has_key?('error')
-			e = JSON::parse(r['error'])
-			raise YoUpdateError, "error from Yo API: #{e['message']} (code:#{e['code']})"
-		end
-	rescue YoUpdateError => e
-		return e.message
+	req = Net::HTTP::Get.new(
+		URI("http://api.justyo.co/subscribers_count/?api_token=#{URI.escape(yo_update_api_key)}")
+	)
+	res = yo_update_access_api(req)
+	data = res.body
+	r = JSON::parse(data)
+	if r.has_key?('result')
+		return r['result']
+	elsif r.has_key?('error')
+		e = JSON::parse(r['error'])
+		raise YoUpdateError, "Error from Yo API: #{e['message']} (code:#{e['code']})"
 	end
 end
 
@@ -85,13 +89,23 @@ add_conf_proc('yo_update', 'Yo! with update' ) do
       @conf['yo_update.send_on_update'] = (@cgi.params['yo_update.send_on_update'][0] == 't')
       @conf['yo_update.send_on_comment'] = (@cgi.params['yo_update.send_on_comment'][0] == 't')
 		test_username = @cgi.params['yo_update.test'][0]
-		if test_username #and not test_username.empty?
-			test_result = "- Sent to <tt>#{h test_username}</tt>: <tt>#{h yo_update_send_yo(test_username)}</tt>"
+		if test_username and not test_username.empty?
+			begin
+				result = yo_update_send_yo(test_username)
+			rescue YoUpdateError => e
+				result = e.message
+			end
+			test_result = "- Sent to <tt>#{h test_username}</tt>: <tt>#{h result}</tt>"
 		end
 	end
 	unless @conf.has_key?('yo_update.send_on_update')
 		@conf['yo_update.send_on_update'] = true
    end
+	begin
+		n_subscribers = yo_update_subscribers_count
+	rescue YoUpdateError => e
+		n_subscribers = e.message
+	end
    
    <<-HTML
    <h3 class="subtitle">API key</h3>
@@ -108,7 +122,7 @@ add_conf_proc('yo_update', 'Yo! with update' ) do
 	</ul>
    <p>Test sending Yo! to <input name="yo_update.test" value="" size="10">#{test_result}</p>
    <h3 class="subtitle">Current Subscribers</h3>
-	<p>#{h yo_update_subscribers_count}</p>
+	<p>#{h n_subscribers}</p>
    HTML
 end
 
