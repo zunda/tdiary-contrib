@@ -52,14 +52,15 @@ def yo_update_access_api(req)
 end
 
 def yo_update_send_yo(username = nil)
-	req = Net::HTTP::Post.new(URI("http://api.justyo.co/yo/"))
 	api_key = yo_update_api_key
 	unless api_key
 		raise YoUpdateError, "Yo API Key is not set"
 	end
 	unless username
+		req = Net::HTTP::Post.new(URI("http://api.justyo.co/yoall/"))
 		req.set_form_data('api_token' => yo_update_api_key)
 	else
+		req = Net::HTTP::Post.new(URI("http://api.justyo.co/yo/"))
 		req.set_form_data('api_token' => yo_update_api_key, 'username' => username)
 	end
 	res = yo_update_access_api(req)
