@@ -23,7 +23,9 @@ class YoUpdateError < StandardError; end
 
 def yo_update_api_key
 	r = @conf['yo_update.api_key']
-	raise YoUpdateError, "Yo API Key is not set" if not r or r.empty?
+	if not r or r.empty?
+		return nil
+	end
 	return r
 end
 
@@ -51,6 +53,10 @@ end
 
 def yo_update_send_yo(username = nil)
 	req = Net::HTTP::Post.new(URI("http://api.justyo.co/yo/"))
+	api_key = yo_update_api_key
+	unless api_key
+		raise YoUpdateError, "Yo API Key is not set"
+	end
 	unless username
 		req.set_form_data('api_token' => yo_update_api_key)
 	else
@@ -65,8 +71,12 @@ def yo_update_send_yo(username = nil)
 end
 
 def yo_update_subscribers_count
+	api_key = yo_update_api_key
+	unless api_key
+		raise YoUpdateError, "Yo API Key is not set"
+	end
 	req = Net::HTTP::Get.new(
-		URI("http://api.justyo.co/subscribers_count/?api_token=#{URI.escape(yo_update_api_key)}")
+		URI("http://api.justyo.co/subscribers_count/?api_token=#{URI.escape(api_key)}")
 	)
 	res = yo_update_access_api(req)
 	data = res.body
