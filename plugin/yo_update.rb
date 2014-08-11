@@ -72,6 +72,15 @@ def yo_update_send_yo(username = nil)
 	return data
 end
 
+def yo_update_send_yo_or_log(username = nil)
+	return unless yo_update_api_key
+	begin
+		yo_update_send_yo(username)
+	rescue YoUpdateError => e
+		@logger.error "yo_update.rb: #{e.message}"
+	end
+end
+
 def yo_update_subscribers_count
 	api_key = yo_update_api_key
 	unless api_key
@@ -137,6 +146,10 @@ add_conf_proc('yo_update', 'Yo! with update' ) do
    <h3 class="subtitle">Current Subscribers</h3>
 	<p>#{h n_subscribers}</p>
    HTML
+end
+
+add_update_proc do
+	yo_update_send_yo_or_log if @conf['yo_update.send_on_update']
 end
 
 # Local Variables:
