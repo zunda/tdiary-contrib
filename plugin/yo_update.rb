@@ -26,7 +26,6 @@ def yo_update_api_key
 	return r
 end
 
-# TODO: rescue timeout and other network errors
 def yo_update_access_api(req)
 	if @conf['proxy']
 		proxy_uri = URI("http://" + @conf['proxy'])
@@ -44,6 +43,8 @@ def yo_update_access_api(req)
 		end
 	rescue Timeout::Error
 		raise YoUpdateError, "Timeout accessing Yo API"
+	rescue SocketError => e
+		raise YoUpdateError, e.message
 	end
 end
 
