@@ -8,7 +8,8 @@
 # distribution, and distribution of modified versions of this
 # work under the terms of GPL version 2 or later.
 #
-# https://dev.justyo.co
+# TODO: Configuration interface in Japanese
+# TODO: Instraction to obtain API key, through http://dev.justyo.co/ ?
 #
 
 require 'uri'
