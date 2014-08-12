@@ -60,13 +60,15 @@ def yo_update_send_yo(username = nil)
 	unless username
 		req = Net::HTTP::Post.new(URI("http://api.justyo.co/yoall/"))
 		req.set_form_data('api_token' => yo_update_api_key)
+		expected = '{}'
 	else
 		req = Net::HTTP::Post.new(URI("http://api.justyo.co/yo/"))
 		req.set_form_data('api_token' => yo_update_api_key, 'username' => username)
+		expected = '{"result": "OK"}'
 	end
 	res = yo_update_access_api(req)
 	data = res.body
-	unless data == '{"result": "OK"}'
+	unless data == expected
 		raise YoUpdateError, "error from Yo API: #{data}"
 	end
 	return data
