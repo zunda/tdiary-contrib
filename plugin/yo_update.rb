@@ -8,8 +8,6 @@
 # distribution, and distribution of modified versions of this
 # work under the terms of GPL version 2 or later.
 #
-# TODO: Configuration interface in Japanese
-#
 
 require 'uri'
 require 'timeout'
