@@ -133,9 +133,9 @@ add_conf_proc('yo_update', 'Yo! with update' ) do
    
    <<-HTML
    <h3 class="subtitle">API key</h3>
-   <p><input name="yo_update.api_key" value="#{h @conf['yo_update.api_key']}" size="70"></p>
+   <p><input name="yo_update.api_key" value="#{h @conf['yo_update.api_key']}" size="40"></p>
    <h3 class="subtitle">Username</h3>
-   <p><input name="yo_update.username" value="#{h @conf['yo_update.username']}" size="70"></p>
+   <p><input name="yo_update.username" value="#{h @conf['yo_update.username']}" size="40"></p>
    <h3 class="subtitle">Send Yo!</h3>
 	<ul>
 	#{%w(send_on_update send_on_comment).map{|action|
