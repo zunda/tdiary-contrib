@@ -8,8 +8,6 @@
 # distribution, and distribution of modified versions of this
 # work under the terms of GPL version 2 or later.
 #
-# TODO: Limit sending Yo only when entries are added, not when modified
-# TODO: Send Yo when commits are added
 # TODO: Add the button to subscribe
 # TODO: Configuration interface in Japanese
 # TODO: Instraction to obtain API key, through http://dev.justyo.co/ ?
@@ -151,7 +149,12 @@ add_conf_proc('yo_update', 'Yo! with update' ) do
 end
 
 add_update_proc do
-	yo_update_send_yo_or_log if @conf['yo_update.send_on_update']
+	case @mode
+	when 'append'
+		yo_update_send_yo_or_log if @conf['yo_update.send_on_update']
+	when 'comment'
+		yo_update_send_yo_or_log if @conf['yo_update.send_on_comment']
+	end
 end
 
 # Local Variables:
