@@ -109,6 +109,12 @@ unless defined? yo_update_conf_label	# maybe defined in a language resource
 	end
 end
 
+unless defined? yo_update_test_result_label	# maybe defined in a language resource
+	def yo_update_test_result_label(username, result)
+		"- Sent to <tt>#{h username}</tt> and got <tt>#{h result}</tt>"
+	end
+end
+
 unless defined? yo_update_conf_html	# maybe defined in a language resource
 	def yo_update_conf_html(conf, n_subscribers, test_result)
 		action_label = {
@@ -158,7 +164,7 @@ add_conf_proc('yo_update', yo_update_conf_label) do
 			rescue YoUpdateError => e
 				result = e.message
 			end
-			test_result = "- Sent to <tt>#{h test_username}</tt>: <tt>#{h result}</tt>"
+			test_result = yo_update_test_result_label(test_username, result)
 		end
 	end
 	unless @conf.has_key?('yo_update.send_on_update')

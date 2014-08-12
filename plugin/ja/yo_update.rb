@@ -13,6 +13,10 @@ def yo_update_conf_label
 	'更新時にYoを送る'
 end
 
+def yo_update_test_result_label(username, result)
+	"- <tt>#{h username}</tt> に Yo を送りました: <tt>#{h result}</tt>"
+end
+
 def yo_update_conf_html(conf, n_subscribers, test_result)
 	action_label = {
 		'send_on_update' => '日記が追加された時',
