@@ -110,7 +110,7 @@ unless defined? yo_update_conf_label	# maybe defined in a language resource
 end
 
 unless defined? yo_update_conf_html	# maybe defined in a language resource
-	def yo_update_conf_html(conf, test_result)
+	def yo_update_conf_html(conf, n_subscribers, test_result)
 		action_label = {
 			'send_on_update' => 'when an entry is added',
 			'send_on_comment' => 'when a comment is posted',
@@ -169,7 +169,7 @@ add_conf_proc('yo_update', yo_update_conf_label) do
 	rescue YoUpdateError => e
 		n_subscribers = e.message
 	end
-	yo_update_conf_html(@conf, test_result)
+	yo_update_conf_html(@conf, n_subscribers, test_result)
 end
 
 add_update_proc do
