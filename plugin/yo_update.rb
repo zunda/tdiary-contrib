@@ -9,7 +9,6 @@
 # work under the terms of GPL version 2 or later.
 #
 # TODO: Configuration interface in Japanese
-# TODO: Instraction to obtain API key, through http://dev.justyo.co/ ?
 #
 
 require 'uri'
@@ -134,6 +133,13 @@ unless defined? yo_update_conf_html	# maybe defined in a language resource
 		<h3 class="subtitle">Yo button</h3>
 		<p>Add the following to somewhere or your diary.</p>
 		<pre>&lt;div id=&quot;yo-button&quot;&gt;&lt;/div&gt;</pre>
+		<h3 class="subtitle">Howto</h3>
+		<ol>
+		<li>Sign in with your personal Yo account at <a href="http://dev.justyo.co/">http://dev.justyo.co/</a>
+		<li>Follow the instructions to obtain new API account.
+			Please leave the Callback URL blank.
+		<li>Copy the API key and API username above.
+		</ol>
 		HTML
 	end
 end
