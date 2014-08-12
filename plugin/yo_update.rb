@@ -8,7 +8,6 @@
 # distribution, and distribution of modified versions of this
 # work under the terms of GPL version 2 or later.
 #
-# TODO: Add the button to subscribe
 # TODO: Configuration interface in Japanese
 # TODO: Instraction to obtain API key, through http://dev.justyo.co/ ?
 #
@@ -147,6 +146,9 @@ add_conf_proc('yo_update', 'Yo! with update' ) do
    <p>Test sending Yo! to <input name="yo_update.test" value="" size="10">#{test_result}</p>
    <h3 class="subtitle">Current Subscribers</h3>
 	<p>#{h n_subscribers}</p>
+   <h3 class="subtitle">Yo button</h3>
+	<p>Add the following to somewhere or your diary.</p>
+	<pre>&lt;div id=&quot;yo-button&quot;&gt;&lt;/div&gt;</pre>
    HTML
 end
 
@@ -156,6 +158,27 @@ add_update_proc do
 		yo_update_send_yo_or_log if @conf['yo_update.send_on_update']
 	when 'comment'
 		yo_update_send_yo_or_log if @conf['yo_update.send_on_comment']
+	end
+end
+
+add_header_proc do
+	if @conf['yo_update.api_key']
+		triggers = []
+		triggers << 'Entry' if @conf['yo_update.send_on_update']
+		triggers << 'Tsukkomi' if @conf['yo_update.send_on_comment']
+		trigger_str = "#{triggers.join(' or ')} is added"
+		<<-HTML
+	<script type="text/javascript"><!--
+		var _yoData = {
+			"username": "#{@conf['yo_update.username']}",
+			"trigger": "#{trigger_str}"
+		};
+		var s = document.createElement("script");
+		s.type = "text/javascript";
+		s.src = "//yoapp.s3.amazonaws.com/js/yo-button.js";
+		(document.head || document.getElementsByTagName("head")[0]).appendChild(s);
+	--></script>
+		HTML
 	end
 end
 
