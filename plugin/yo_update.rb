@@ -141,7 +141,7 @@ add_conf_proc('yo_update', 'Yo! with update' ) do
 	#{%w(send_on_update send_on_comment).map{|action|
 		checked = @conf["yo_update.#{action}"] ? ' checked' : ''
 		label = action
-		%Q|<li><label for="#{action}"><input name="yo_update.#{action}" value="t" type="checkbox"#{checked}>#{label}</label>|
+		%Q|<li><label for="yo_update.#{action}"><input id="yo_update.#{action}" name="yo_update.#{action}" value="t" type="checkbox"#{checked}>#{label}</label>|
 	}.join("\n\t")}
 	</ul>
    <p>Test sending Yo! to <input name="yo_update.test" value="" size="10">#{test_result}</p>
