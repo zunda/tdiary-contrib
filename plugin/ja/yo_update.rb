@@ -10,10 +10,10 @@
 #
 
 def yo_update_conf_label
-	'Send Yo with updates'
+	'更新時にYoを送る'
 end
 
-def yo_update_conf_html(conf, test_result)
+def yo_update_conf_html(conf, n_subscribers, test_result)
 	action_label = {
 		'send_on_update' => '日記が追加された時',
 		'send_on_comment' => 'ツッコミされた時',
@@ -23,25 +23,25 @@ def yo_update_conf_html(conf, test_result)
 	<p><input name="yo_update.api_key" value="#{h conf['yo_update.api_key']}" size="40"></p>
 	<h3 class="subtitle">Username</h3>
 	<p><input name="yo_update.username" value="#{h conf['yo_update.username']}" size="40"></p>
-	<h3 class="subtitle">Send Yo</h3>
+	<h3 class="subtitle">Yo を送るタイミング</h3>
 	<ul>
 	#{%w(send_on_update send_on_comment).map{|action|
 		checked = conf["yo_update.#{action}"] ? ' checked' : ''
 		%Q|<li><label for="yo_update.#{action}"><input id="yo_update.#{action}" name="yo_update.#{action}" value="t" type="checkbox"#{checked}>#{action_label[action]}</label>|
 	}.join("\n\t")}
 	</ul>
-	<p>Test sending Yo! to <input name="yo_update.test" value="" size="10">#{test_result}</p>
-	<h3 class="subtitle">Current Subscribers</h3>
+	<p>Yo を<input name="yo_update.test" value="" size="10">に送ってみる#{test_result}</p>
+	<h3 class="subtitle">現在の受信者数</h3>
 	<p>#{h n_subscribers}</p>
-	<h3 class="subtitle">Yo button</h3>
-	<p>Add the following to somewhere or your diary.</p>
+	<h3 class="subtitle">Yoボタン</h3>
+	<p>ページのどこかに下記を追加してください</p>
 	<pre>&lt;div id=&quot;yo-button&quot;&gt;&lt;/div&gt;</pre>
-	<h3 class="subtitle">Howto</h3>
+	<h3 class="subtitle">やり方</h3>
 	<ol>
-	<li>Sign in with your personal Yo account at <a href="http://dev.justyo.co/">http://dev.justyo.co/</a>
-	<li>Follow the instructions to obtain new API account.
-		Please leave the Callback URL blank.
-	<li>Copy the API key and API username above.
+	<li>個人用 Yo アカウントで <a href="http://dev.justyo.co/">http://dev.justyo.co/</a> にログインする
+	<li>ページ内の指示に従って APIアカウントを作成する。
+		Callback URL は空白のままにしてください
+	<li>API key と API username を上にコピーする
 	</ol>
 	HTML
 end
