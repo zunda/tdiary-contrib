@@ -142,7 +142,7 @@ add_conf_proc('yo_update', 'Yo! with update' ) do
 		checked = @conf["yo_update.#{action}"] ? ' checked' : ''
 		label = action
 		%Q|<li><label for="#{action}"><input name="yo_update.#{action}" value="t" type="checkbox"#{checked}>#{label}</label>|
-	}.join("\n")}
+	}.join("\n\t")}
 	</ul>
    <p>Test sending Yo! to <input name="yo_update.test" value="" size="10">#{test_result}</p>
    <h3 class="subtitle">Current Subscribers</h3>
