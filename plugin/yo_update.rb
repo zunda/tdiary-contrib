@@ -106,11 +106,11 @@ end
 
 add_conf_proc('yo_update', 'Yo! with update' ) do
 	test_result = ''
-   if @mode == 'saveconf' then
-      @conf['yo_update.api_key'] = @cgi.params['yo_update.api_key'][0]
-      @conf['yo_update.username'] = @cgi.params['yo_update.username'][0]
-      @conf['yo_update.send_on_update'] = (@cgi.params['yo_update.send_on_update'][0] == 't')
-      @conf['yo_update.send_on_comment'] = (@cgi.params['yo_update.send_on_comment'][0] == 't')
+	if @mode == 'saveconf' then
+		@conf['yo_update.api_key'] = @cgi.params['yo_update.api_key'][0]
+		@conf['yo_update.username'] = @cgi.params['yo_update.username'][0]
+		@conf['yo_update.send_on_update'] = (@cgi.params['yo_update.send_on_update'][0] == 't')
+		@conf['yo_update.send_on_comment'] = (@cgi.params['yo_update.send_on_comment'][0] == 't')
 		test_username = @cgi.params['yo_update.test'][0]
 		if test_username and not test_username.empty?
 			begin
@@ -123,19 +123,19 @@ add_conf_proc('yo_update', 'Yo! with update' ) do
 	end
 	unless @conf.has_key?('yo_update.send_on_update')
 		@conf['yo_update.send_on_update'] = true
-   end
+	end
 	begin
 		n_subscribers = yo_update_subscribers_count
 	rescue YoUpdateError => e
 		n_subscribers = e.message
 	end
-   
-   <<-HTML
-   <h3 class="subtitle">API key</h3>
-   <p><input name="yo_update.api_key" value="#{h @conf['yo_update.api_key']}" size="40"></p>
-   <h3 class="subtitle">Username</h3>
-   <p><input name="yo_update.username" value="#{h @conf['yo_update.username']}" size="40"></p>
-   <h3 class="subtitle">Send Yo!</h3>
+
+	<<-HTML
+	<h3 class="subtitle">API key</h3>
+	<p><input name="yo_update.api_key" value="#{h @conf['yo_update.api_key']}" size="40"></p>
+	<h3 class="subtitle">Username</h3>
+	<p><input name="yo_update.username" value="#{h @conf['yo_update.username']}" size="40"></p>
+	<h3 class="subtitle">Send Yo!</h3>
 	<ul>
 	#{%w(send_on_update send_on_comment).map{|action|
 		checked = @conf["yo_update.#{action}"] ? ' checked' : ''
@@ -143,13 +143,13 @@ add_conf_proc('yo_update', 'Yo! with update' ) do
 		%Q|<li><label for="yo_update.#{action}"><input id="yo_update.#{action}" name="yo_update.#{action}" value="t" type="checkbox"#{checked}>#{label}</label>|
 	}.join("\n\t")}
 	</ul>
-   <p>Test sending Yo! to <input name="yo_update.test" value="" size="10">#{test_result}</p>
-   <h3 class="subtitle">Current Subscribers</h3>
+	<p>Test sending Yo! to <input name="yo_update.test" value="" size="10">#{test_result}</p>
+	<h3 class="subtitle">Current Subscribers</h3>
 	<p>#{h n_subscribers}</p>
-   <h3 class="subtitle">Yo button</h3>
+	<h3 class="subtitle">Yo button</h3>
 	<p>Add the following to somewhere or your diary.</p>
 	<pre>&lt;div id=&quot;yo-button&quot;&gt;&lt;/div&gt;</pre>
-   HTML
+	HTML
 end
 
 add_update_proc do
