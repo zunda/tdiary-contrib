@@ -104,7 +104,41 @@ def yo_update_subscribers_count
 	end
 end
 
-add_conf_proc('yo_update', 'Yo! with update' ) do
+unless defined? yo_update_conf_label	# maybe defined in a language resource
+	def yo_update_conf_label
+		'Send Yo with updates'
+	end
+end
+
+unless defined? yo_update_conf_html	# maybe defined in a language resource
+	def yo_update_conf_html(conf, test_result)
+		action_label = {
+			'send_on_update' => 'when an entry is added',
+			'send_on_comment' => 'when a comment is posted',
+		}
+		<<-HTML
+		<h3 class="subtitle">API key</h3>
+		<p><input name="yo_update.api_key" value="#{h conf['yo_update.api_key']}" size="40"></p>
+		<h3 class="subtitle">Username</h3>
+		<p><input name="yo_update.username" value="#{h conf['yo_update.username']}" size="40"></p>
+		<h3 class="subtitle">Send Yo</h3>
+		<ul>
+		#{%w(send_on_update send_on_comment).map{|action|
+			checked = conf["yo_update.#{action}"] ? ' checked' : ''
+			%Q|<li><label for="yo_update.#{action}"><input id="yo_update.#{action}" name="yo_update.#{action}" value="t" type="checkbox"#{checked}>#{action_label[action]}</label>|
+		}.join("\n\t")}
+		</ul>
+		<p>Test sending Yo! to <input name="yo_update.test" value="" size="10">#{test_result}</p>
+		<h3 class="subtitle">Current Subscribers</h3>
+		<p>#{h n_subscribers}</p>
+		<h3 class="subtitle">Yo button</h3>
+		<p>Add the following to somewhere or your diary.</p>
+		<pre>&lt;div id=&quot;yo-button&quot;&gt;&lt;/div&gt;</pre>
+		HTML
+	end
+end
+
+add_conf_proc('yo_update', yo_update_conf_label) do
 	test_result = ''
 	if @mode == 'saveconf' then
 		@conf['yo_update.api_key'] = @cgi.params['yo_update.api_key'][0]
@@ -129,27 +163,7 @@ add_conf_proc('yo_update', 'Yo! with update' ) do
 	rescue YoUpdateError => e
 		n_subscribers = e.message
 	end
-
-	<<-HTML
-	<h3 class="subtitle">API key</h3>
-	<p><input name="yo_update.api_key" value="#{h @conf['yo_update.api_key']}" size="40"></p>
-	<h3 class="subtitle">Username</h3>
-	<p><input name="yo_update.username" value="#{h @conf['yo_update.username']}" size="40"></p>
-	<h3 class="subtitle">Send Yo!</h3>
-	<ul>
-	#{%w(send_on_update send_on_comment).map{|action|
-		checked = @conf["yo_update.#{action}"] ? ' checked' : ''
-		label = action
-		%Q|<li><label for="yo_update.#{action}"><input id="yo_update.#{action}" name="yo_update.#{action}" value="t" type="checkbox"#{checked}>#{label}</label>|
-	}.join("\n\t")}
-	</ul>
-	<p>Test sending Yo! to <input name="yo_update.test" value="" size="10">#{test_result}</p>
-	<h3 class="subtitle">Current Subscribers</h3>
-	<p>#{h n_subscribers}</p>
-	<h3 class="subtitle">Yo button</h3>
-	<p>Add the following to somewhere or your diary.</p>
-	<pre>&lt;div id=&quot;yo-button&quot;&gt;&lt;/div&gt;</pre>
-	HTML
+	yo_update_conf_html(@conf, test_result)
 end
 
 add_update_proc do
